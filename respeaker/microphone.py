@@ -32,8 +32,7 @@ except: # Python 3
 
 import pyaudio
 
-from respeaker.pixel_ring import pixel_ring
-from respeaker.vad import vad
+from vad import vad
 
 
 logger = logger = logging.getLogger('mic')
@@ -68,7 +67,6 @@ class Microphone:
     recording_mask = (1 << 2)
 
     def __init__(self, pyaudio_instance=None, quit_event=None, decoder=None):
-        pixel_ring.set_color(rgb=0x400000)
 
         self.pyaudio_instance = pyaudio_instance if pyaudio_instance else pyaudio.PyAudio()
 
@@ -156,8 +154,6 @@ class Microphone:
         self.decoder.end_utt()
         self.decoder.start_utt()
 
-        pixel_ring.off()
-
         self.detect_history.clear()
 
         self.detect_queue.queue.clear()
@@ -210,7 +206,6 @@ class Microphone:
         self.listen_queue.queue.clear()
         self.status |= self.listening_mask
         self.start()
-        pixel_ring.listen()
 
         logger.info('Start listening')
 
@@ -286,7 +281,6 @@ class Microphone:
             if self.listen_countdown[0] <= 0 or self.listen_countdown[1] <= 0:
                 self.listen_queue.put('')
                 self.status &= ~self.listening_mask
-                pixel_ring.wait()
                 logger.info('Stop listening')
 
             self.active = active
